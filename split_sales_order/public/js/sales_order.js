@@ -6,6 +6,23 @@ frappe.ui.form.on('Sales Order', {
             frm.add_custom_button(__('Split Sales Order'), function() {
                 splitSalesOrder(frm);
             });
+
+            frm.add_custom_button(__('Create SI by Pay. Term'), function() {
+                frappe.call({
+                    method: "split_sales_order.sales_order.create_si_by_pay_term",
+                    args: {
+                        'sales_order': frm.doc.name,
+                    },
+                    callback: (r) => {
+                        if (r.message) {
+                            frappe.msgprint({
+                                message: __('Sales Invoice  Untuk <a href="/app/sales-invoice/view/list?sales_order=' + r.message  + ' "> ' + r.message + '</a> sudah dibuat'),
+                                indicator: 'green'
+                            });
+                        }
+                    }
+                });
+            })
         }
     }
 });

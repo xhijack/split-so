@@ -1,9 +1,11 @@
 import json
+from erpnext.selling.doctype.sales_order.sales_order import make_sales_invoice
 import frappe
 
 from datetime import timedelta
 
 from erpnext.controllers.accounts_controller import update_child_qty_rate
+
 
 @frappe.whitelist()
 def split_sales_order(sales_order):
@@ -49,3 +51,43 @@ def split_sales_order(sales_order):
     new_sales_order.insert()
 
     return new_sales_order.name
+
+
+
+
+@frappe.whitelist()
+def create_si_by_pay_term(sales_order):
+    sales_order = frappe.get_cached_doc('Sales Order', sales_order)
+    for item in sales_order.items:
+        if item.qty < len(sales_order.payment_schedule) and item.qty % len(sales_order.payment_schedule) != 0:
+            frappe.throw('Jumlah Qty kurang dari jumlah pembayaran yang diatur di Payment Schedule')
+            return False
+        else:
+            pass
+
+    for ps in sales_order.payment_schedule:
+        # make_sales_invoice(sales_order.name, ps)
+        si = make_sales_invoice(sales_order.name)
+        si.payment_terms_template = None
+        si.due_date = ps.due_date
+        for item in si.items:
+            item.qty = item.qty / len(sales_order.payment_schedule)
+        si.insert()
+    frappe.db.commit()
+    return sales_order.name
+
+      
+    #     for item in sales_order.items:
+    #         qty = item.qty / len(sales_order.payment_schedule)
+    #         new_sales_invoice.append('items', {
+    #             'item_code': item.item_code,
+    #             'qty': qty,
+    #             'rate': item.rate,
+    #             'warehouse': item.warehouse,
+    #             'sales_order': sales_order.name,
+    #         })
+
+    #     new_sales_invoice.insert()
+    # frappe.db.commit()
+    # return sales_order.name
+
