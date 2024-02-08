@@ -53,8 +53,6 @@ def split_sales_order(sales_order):
     return new_sales_order.name
 
 
-
-
 @frappe.whitelist()
 def create_si_by_pay_term(sales_order):
     sales_order = frappe.get_cached_doc('Sales Order', sales_order)
@@ -69,11 +67,13 @@ def create_si_by_pay_term(sales_order):
         # make_sales_invoice(sales_order.name, ps)
         si = make_sales_invoice(sales_order.name)
         si.payment_terms_template = None
+        si.payment_schedule = None
         si.due_date = ps.due_date
         for item in si.items:
             item.qty = item.qty / len(sales_order.payment_schedule)
         si.insert()
     frappe.db.commit()
+    
     return sales_order.name
 
       
