@@ -73,7 +73,6 @@ def create_si_by_pay_term(sales_order):
             item.qty = item.qty / len(sales_order.payment_schedule)
         si.insert()
     frappe.db.commit()
-    
     return sales_order.name
 
       
