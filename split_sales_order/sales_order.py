@@ -67,7 +67,6 @@ def create_si_by_pay_term(sales_order):
         # make_sales_invoice(sales_order.name, ps)
         si = make_sales_invoice(sales_order.name)
         si.payment_terms_template = None
-        si.payment_schedule = None
         si.due_date = ps.due_date
         for item in si.items:
             item.qty = item.qty / len(sales_order.payment_schedule)
