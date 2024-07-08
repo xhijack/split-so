@@ -66,8 +66,10 @@ def create_si_by_pay_term(sales_order):
     for ps in sales_order.payment_schedule:
         # make_sales_invoice(sales_order.name, ps)
         si = make_sales_invoice(sales_order.name)
-        si.payment_terms_template = None
+        si.payment_terms_template = "Arisan"
         si.due_date = ps.due_date
+        si.posting_date = ps.due_date
+        si.set_posting_time = 1
         for item in si.items:
             item.qty = item.qty / len(sales_order.payment_schedule)
         si.insert()
